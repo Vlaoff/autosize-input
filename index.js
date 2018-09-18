@@ -49,7 +49,7 @@ module.exports = function (element, options) {
                       ';text-transform:' + elementStyle.textTransform
 
   // Assigns an appropriate width to the given `element` based on its contents.
-  function setWidth () {
+  function setWidth ({add = null}) {
     var string = element.value || element.getAttribute('placeholder') || ''
     // Check if the `ghostElement` exists. If no, create it.
     var ghostElement =
@@ -58,14 +58,19 @@ module.exports = function (element, options) {
     ghostElement.style.cssText += elementCssText
     ghostElement.innerHTML = escapeSpecialCharacters(string)
     // Copy the width of `ghostElement` to `element`.
-    var width = window.getComputedStyle(ghostElement).width
+    var width
+    if (add) {
+      width = window.getComputedStyle(ghostElement).width
+      width = (parseInt(width) + add) + 'px'
+    } else width = window.getComputedStyle(ghostElement).width
+
     element.style.width = width
     return width
   }
 
-  element.addEventListener('input', setWidth)
+  element.addEventListener('input', setWidth(options))
 
-  var width = setWidth()
+  var width = setWidth(options)
 
   // Set `min-width` only if `options.minWidth` was set, and only if the initial
   // width is non-zero.
